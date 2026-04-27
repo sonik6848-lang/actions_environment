@@ -4,8 +4,7 @@ Resources:
   UdaBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: uda-iye-bucket
-
+      BucketName: uda-iye-sonik-bucket
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: error.html
