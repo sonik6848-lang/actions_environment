@@ -46,4 +46,12 @@ jobs: # Jobs defined in the workflow
         name: udatest
         template: udatest.yml
         no-fail-on-empty-changeset: "1"
+
+    - name: Check stack failure reason
+      run: |
+        aws cloudformation describe-stack-events \
+          --stack-name udatest \
+          --region us-east-1 \
+          --query "StackEvents[?ResourceStatus=='CREATE_FAILED'].{Resource:LogicalResourceId, Reason:ResourceStatusReason}" \
+          --output table
         
