@@ -20,6 +20,26 @@ jobs: # Jobs defined in the workflow
         aws-session-token: ${{secrets.AWS_SESSION_TOKEN}}
         aws-region: us-east-1
 
+       # ✅ Add this step to clean up ROLLBACK_COMPLETE stack
+    - name: Delete stack if in ROLLBACK_COMPLETE state
+      run: |
+        STATUS=$(aws cloudformation describe-stacks \
+          --stack-name udatest \
+          --query "Stacks[0].StackStatus" \
+          --output text 2>/dev/null || echo "DOES_NOT_EXIST")
+
+        echo "Current stack status: $STATUS"
+
+        if [ "$STATUS" = "ROLLBACK_COMPLETE" ]; then
+          echo "Stack is in ROLLBACK_COMPLETE. Deleting..."
+          aws cloudformation delete-stack --stack-name udatest
+          aws cloudformation wait stack-delete-complete --stack-name udatest
+          echo "Stack deleted successfully."
+        else
+          echo "No deletion needed. Proceeding..."
+        fi
+
+
     - name: Create CloudFormation Stack
       uses: aws-actions/aws-cloudformation-github-deploy@v1
       with:
